@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro - Mulher-Maravilha</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Mulher-Maravilha</h1>
+        <p>Cadastre-se para entrar no Chat das Heroínas</p>
+
+        <label for="cadUsuario">Nome</label>
+        <input type="text" id="cadUsuario" placeholder="Digite seu nome" required>
+
+        <label for="cadEmail">E-mail</label>
+        <input type="email" id="cadEmail" placeholder="Digite seu e-mail" required>
+
+        <label for="cadSenha">Senha</label>
+        <input type="password" id="cadSenha" placeholder="Digite a sua senha" required>
+
+        <button id="btnCadastrar">Cadastrar</button>
+        <div id="msgCadastro" class="mensagem" style="margin-top: 15px; font-weight: bold;"></div>
+    </div>
+
+    <script>
+        const btnCadastrar = document.querySelector('#btnCadastrar');
+        const msgCadastro = document.querySelector('#msgCadastro');
+
+        btnCadastrar.addEventListener('click', async (e) => {
+            e.preventDefault();
+
+            const usuario = document.querySelector('#cadUsuario').value;
+            const email = document.querySelector('#cadEmail').value;
+            const senha = document.querySelector('#cadSenha').value;
+
+            if (!usuario || !email || !senha) {
+                msgCadastro.style.color = 'red';
+                msgCadastro.innerText = 'Preencha todos os campos!';
+                return;
+            }
+
+            msgCadastro.style.color = 'white';
+            msgCadastro.innerText = 'Processando cadastro...';
+
+            try {
+                // Chamada usando caminho relativo correto para o servidor
+                const resposta = await fetch('/cadastro', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ usuario, email, senha })
+                });
+
+                const dados = await resposta.json();
+
+                if (!resposta.ok) {
+                    msgCadastro.style.color = 'red';
+                    msgCadastro.innerText = dados.erro;
+                    return;
+                }
+
+                msgCadastro.style.color = 'green';
+                msgCadastro.innerText = dados.mensagem;
+
+                // Redireciona para o login apenas após sucesso
+                setTimeout(() => {
+                    window.location.href = 'logui.html';
+                }, 1200);
+
+            } catch (erro) {
+                console.error("Erro na requisição:", erro);
+                msgCadastro.style.color = 'red';
+                msgCadastro.innerText = 'Erro de conexão com o servidor! Verifique se ele está rodando.';
+            }
+        });
+    </script>
+</body>
+</html>

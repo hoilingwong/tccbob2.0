@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat com a Mulher-Maravilha</title>
+    <link rel="stylesheet" href="styless.css">
+</head>
+<body style="background: url('m32.jpg') no-repeat center center fixed; background-size: cover;">
+    <div class="chat">
+        <header class="chat-header">
+            <img src="m2.jpg" alt="Mulher-Maravilha" class="foto-heroina">
+            <div class="info-heroina">
+                <h1>Mulher-Maravilha</h1>
+                <span>● Online</span>
+            </div>
+        </header>
+
+        <main class="conversa" id="conversa">
+            <div class="mensagem heroina">
+                <p>Olá! Eu sou a Mulher-Maravilha. Como posso ajudar você hoje?</p>
+            </div>
+        </main>
+
+        <footer class="area-mensagem">
+            <input type="text" id="inputMensagem" placeholder="Digite sua mensagem...">
+            <button id="btnEnviar">➤</button>
+        </footer>
+    </div>
+
+    <script>
+        const inputMensagem = document.querySelector('#inputMensagem');
+        const btnEnviar = document.querySelector('#btnEnviar');
+        const conversa = document.querySelector('#conversa');
+        let historico = [];
+
+        async function enviarMensagem() {
+            const texto = inputMensagem.value.trim();
+            if (!texto) return;
+
+            // Adiciona mensagem do usuário na tela
+            conversa.innerHTML += `<div class="mensagem usuario"><p>${texto}</p></div>`;
+            inputMensagem.value = '';
+            conversa.scrollTop = conversa.scrollHeight;
+
+            historico.push({ role: "user", content: texto });
+
+            try {
+                const resposta = await fetch('/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ historico })
+                });
+
+                const dados = await resposta.json();
+
+                if (resposta.ok) {
+                    // Adiciona resposta da IA na tela
+                    conversa.innerHTML += `<div class="mensagem heroina"><p>${dados.resposta}</p></div>`;
+                    historico.push({ role: "assistant", content: dados.resposta });
+                } else {
+                    conversa.innerHTML += `<div class="mensagem heroina"><p>Ops! Tive um problema de comunicação.</p></div>`;
+                }
+            } catch (error) {
+                conversa.innerHTML += `<div class="mensagem heroina"><p>Erro ao conectar ao servidor.</p></div>`;
+            }
+            conversa.scrollTop = conversa.scrollHeight;
+        }
+
+        btnEnviar.addEventListener('click', enviarMensagem);
+        inputMensagem.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') enviarMensagem();
+        });
+    </script>
+</body>
+</html>

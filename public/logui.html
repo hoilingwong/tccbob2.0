@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Mulher-Maravilha</title>
+    <link rel="stylesheet" href="stylesss.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Mulher-Maravilha</h1>
+        
+        <form id="formLogin">
+            <label for="email">E-mail</label>
+            <input type="email" id="email" placeholder="Digite seu e-mail" required>
+
+            <label for="senha">Senha</label>
+            <input type="password" id="SENHA" placeholder="Digite a sua senha" required>
+
+            <button type="submit" id="btnCadastrar">Entrar</button>
+        </form>
+
+        <p id="mensagem" style="margin-top: 15px; font-weight: bold;"></p>
+    </div>
+
+    <script>
+        const formLogin = document.querySelector('#formLogin');
+        const mensagem = document.querySelector('#mensagem');
+
+        formLogin.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const email = document.querySelector('#email').value;
+            const senha = document.querySelector('#SENHA').value;
+
+            try {
+                const resposta = await fetch('/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, senha })
+                });
+
+                const dados = await resposta.json();
+
+                if (!resposta.ok) {
+                    mensagem.style.color = 'red';
+                    mensagem.innerText = dados.erro;
+                    return;
+                }
+
+                mensagem.style.color = 'green';
+                mensagem.innerText = dados.mensagem;
+
+                // Redireciona para a tela do chat
+                setTimeout(() => {
+                    window.location.href = 'chat.html';
+                }, 1000);
+
+            } catch (erro) {
+                mensagem.style.color = 'red';
+                mensagem.innerText = 'Erro ao conectar com o servidor!';
+            }
+        });
+    </script>
+</body>
+</html> 
